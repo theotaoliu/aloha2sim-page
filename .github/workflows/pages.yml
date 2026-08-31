@@ -27,7 +27,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # enablement turns Pages on through the API if it is off, or configure-pages fails with
+      # "Get Pages site failed" on a repository whose Pages source was never set to Actions.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
