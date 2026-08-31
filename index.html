@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>aloha2sim — a MuJoCo twin of the lab ALOHA-2 workcell</title>
+<meta name="description" content="A MuJoCo model of the lab ALOHA-2 workcell running hidden-property pick-and-place, built so that RLinf can drive it for online RL fine-tuning of pi0 / pi0.5.">
+<meta property="og:title" content="aloha2sim">
+<meta property="og:description" content="A MuJoCo twin of the lab ALOHA-2 workcell, running hidden-property pick-and-place.">
+<meta property="og:image" content="https://theotaoliu.github.io/aloha2sim-page/media/task1-poster.jpg">
+<meta property="og:url" content="https://theotaoliu.github.io/aloha2sim-page/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://theotaoliu.github.io/aloha2sim-page/">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#129302;</text></svg>">
+<style>
+:root{
+  --bg:#ffffff; --bg-alt:#f6f7f9;
+  --fg:#1a1c1f; --fg-muted:#5b6169; --fg-faint:#868d96;
+  --rule:#e2e5e9; --rule-strong:#c9ced5;
+  --accent:#0b6b6b; --accent-soft:#e3f1f0; --accent-fg:#ffffff;
+  --cube:#c3c9d1;
+  --maxw:960px;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#101215; --bg-alt:#171a1e;
+    --fg:#e8eaed; --fg-muted:#a8b0b9; --fg-faint:#7c848d;
+    --rule:#282d33; --rule-strong:#3a4149;
+    --accent:#4fbdb1; --accent-soft:#14302e; --accent-fg:#08110f;
+    --cube:#39424f;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:var(--sans); font-size:17px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px}
+a{color:var(--accent); text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono); font-size:.88em}
+
+/* ---------- header ---------- */
+header{
+  padding:64px 0 40px; text-align:center;
+  border-bottom:1px solid var(--rule);
+  background:linear-gradient(180deg,var(--bg-alt),var(--bg));
+}
+h1{
+  font-family:var(--serif); font-weight:600; font-size:clamp(1.15rem,2.6vw,1.8rem);
+  line-height:1.3; letter-spacing:-0.01em; margin:0 auto;
+}
+.summary{max-width:40em; margin:20px auto 0; color:var(--fg-muted); font-size:1rem}
+
+/* ---------- sections ---------- */
+section{padding:52px 0; border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+h2{
+  font-family:var(--serif); font-size:1.6rem; font-weight:600;
+  margin:0 0 22px; letter-spacing:-.01em; text-align:center;
+}
+p{margin:0 0 16px}
+.lead{max-width:44em; margin:0 auto 16px; text-align:justify; hyphens:auto}
+
+/* ---------- video ---------- */
+.vid{margin:30px 0 0}
+.vid video{
+  width:100%; height:auto; display:block; border-radius:8px;
+  background:#000; border:1px solid var(--rule);
+}
+.vid-head{display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; margin:0 0 12px}
+.vid-tag{
+  padding:3px 10px; border-radius:5px; background:var(--accent); color:var(--accent-fg);
+  font-size:.76rem; font-weight:700; letter-spacing:.04em; flex:none;
+}
+.vid-title{font-weight:650; font-size:1.05rem}
+.vid-field{
+  font-family:var(--mono); font-size:.82rem; color:var(--accent);
+  background:var(--accent-soft); padding:2px 8px; border-radius:4px;
+}
+.vid-note{
+  margin:12px 0 0; font-size:.89rem; line-height:1.6; color:var(--fg-muted);
+  border-left:3px solid var(--rule-strong); padding-left:14px;
+}
+.vid-note b{color:var(--fg)}
+
+/* ---------- figure ---------- */
+figure{margin:26px 0 0; text-align:center}
+figure svg{width:100%; max-width:580px; height:auto}
+figcaption{
+  margin:12px auto 0; max-width:46em; text-align:left;
+  font-size:.88rem; line-height:1.55; color:var(--fg-muted);
+}
+figcaption b{color:var(--fg)}
+
+/* ---------- table ---------- */
+.tablewrap{overflow-x:auto; margin:26px auto 0; max-width:34em; -webkit-overflow-scrolling:touch}
+table{border-collapse:collapse; font-size:.86rem; min-width:100%; white-space:nowrap}
+th,td{padding:7px 14px; text-align:center; border:0}
+th{font-weight:650; font-size:.79rem; color:var(--fg-muted); letter-spacing:.02em}
+thead tr th{border-bottom:1.5px solid var(--rule-strong)}
+td:first-child,th:first-child{text-align:left; font-family:var(--mono); font-size:.82rem}
+tbody tr:nth-child(even){background:var(--bg-alt)}
+td.num{font-family:var(--mono); font-size:.82rem}
+
+/* ---------- cards ---------- */
+.cards{display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  max-width:44em; margin:24px auto 0}
+.card{padding:20px 22px; border:1px solid var(--rule); border-radius:8px; background:var(--bg-alt)}
+.card h3{margin:0 0 8px; font-size:1rem; font-weight:650; letter-spacing:-.005em}
+.card p{margin:0; font-size:.9rem; line-height:1.6; color:var(--fg-muted)}
+.card p b{color:var(--fg)}
+
+/* ---------- footer ---------- */
+footer{
+  padding:36px 0 48px; text-align:center; font-size:.86rem; color:var(--fg-faint);
+  border-top:1px solid var(--rule);
+}
+footer a{color:var(--fg-muted)}
+
+@media (max-width:640px){
+  body{font-size:16px}
+  header{padding:44px 0 32px}
+  section{padding:40px 0}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>aloha2sim: A MuJoCo Twin of the Lab ALOHA-2 Workcell</h1>
+    <p class="summary">A simulation of the physical cell rather than of a generic one — the same
+    table markings, the same 31.1&nbsp;mm cubes and waypoints taken from the recorded episodes —
+    built so that RLinf can drive it for online RL fine-tuning of π0&nbsp;/&nbsp;π0.5.</p>
+  </div>
+</header>
+
+<section id="rollout">
+  <div class="wrap">
+    <h2>Simulated Rollout</h2>
+    <p class="lead">The scene is Task 1 of the real-robot study, hidden-property pick-and-place,
+    rebuilt in MuJoCo. Geometry is not invented: the pick point and the three target zones are the
+    forward-kinematic fingertip positions of 54 usable recorded episodes, and the table markings were
+    measured on the real rig and cross-checked against the overhead camera frame.</p>
+
+    <div class="vid">
+      <div class="vid-head">
+        <span class="vid-tag">TASK 1</span>
+        <span class="vid-title">Hidden-property pick-and-place</span>
+        <span class="vid-field">aloha2_lab_hidden_property_grasp</span>
+      </div>
+      <video controls autoplay muted loop playsinline preload="metadata"
+             poster="media/task1-poster.jpg">
+        <source src="media/task1-hidden-property-grasp.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+        <a href="media/task1-hidden-property-grasp.mp4">Download the video</a>.
+      </video>
+      <p class="vid-note">MuJoCo's interactive viewer, with the <b>left arm</b> driven by the
+      scripted waypoint policy that generates the demonstrations; the right arm holds a fixed pose.
+      The lettered rectangles on the table are the masking-tape targets <b>A</b>, <b>B</b>, <b>C</b>
+      and the unused distractor <b>D</b>, and the cube starts on the painted cross in front of them.
+      8.6&nbsp;s, no audio.</p>
+    </div>
+  </div>
+</section>
+
+<section id="scene">
+  <div class="wrap">
+    <h2>The Task</h2>
+    <p class="lead">Three cubes — <b>A</b>, <b>B</b>, <b>C</b> — share one 31.1&nbsp;mm hollow shell
+    and one colour, and differ only in what a camera cannot see: A and B in mass at equal surface
+    friction, A and C in friction at equal mass. One cube is present per episode and each has its own
+    target, so the destination cannot be read off the pre-grasp image. Targets are 45&nbsp;mm apart,
+    which caps the success radius at 20&nbsp;mm; an episode is 500 control steps, 10&nbsp;s at
+    50&nbsp;Hz. Since evaluation is balanced across the three cubes, a policy that always releases in
+    the same region scores exactly 1/3 by construction — the task's collapse floor, not a level of
+    ability.</p>
+
+    <figure>
+      <svg viewBox="-128 -58 226 168" role="img"
+           aria-label="Plan view of the table: three tape markers A, B and C plus an unused distractor D, 45 millimetres apart, and the cube starting on a painted cross 94 millimetres in front of them.">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M0,1 L10,5 L0,9 z" fill="var(--accent)"/>
+          </marker>
+        </defs>
+        <rect x="-126" y="-56" width="222" height="164" rx="4" fill="var(--bg-alt)" stroke="var(--rule)" stroke-width=".6"/>
+
+        <g fill="none" stroke="var(--accent)" stroke-width=".7" stroke-dasharray="3 2.5" opacity=".55">
+          <circle cx="-82" cy="-23" r="20"/><circle cx="-37" cy="-23" r="20"/><circle cx="8" cy="-23" r="20"/>
+        </g>
+        <g fill="none" stroke="var(--accent)" stroke-width=".7" opacity=".5" marker-end="url(#ah)">
+          <path d="M-14,55 C-40,25 -70,10 -80,-1"/>
+          <path d="M-12,55 C-20,25 -33,8 -37,-1"/>
+          <path d="M-10,55 C 10,25 6,8 8,-1"/>
+        </g>
+        <g stroke="var(--accent)" stroke-width=".9" fill="var(--accent-soft)">
+          <rect x="-92" y="-35.5" width="20" height="25" rx="1.5"/>
+          <rect x="-47" y="-35.5" width="20" height="25" rx="1.5"/>
+          <rect x="-2"  y="-35.5" width="20" height="25" rx="1.5"/>
+        </g>
+        <rect x="43" y="-35.5" width="20" height="25" rx="1.5" fill="none"
+              stroke="var(--rule-strong)" stroke-width=".9" stroke-dasharray="2 2"/>
+        <g font-family="ui-monospace,Menlo,monospace" font-size="10" text-anchor="middle" fill="var(--accent)">
+          <text x="-82" y="-19">A</text><text x="-37" y="-19">B</text><text x="8" y="-19">C</text>
+          <text x="53" y="-19" fill="var(--fg-faint)">D</text>
+        </g>
+
+        <g stroke="var(--rule-strong)" stroke-width=".5" fill="none">
+          <path d="M-82,-42 L-82,-47 M-37,-42 L-37,-47 M-82,-44.5 L-37,-44.5"/>
+          <path d="M73,-23 L83,-23 M73,71 L83,71 M78,-23 L78,71"/>
+        </g>
+        <g font-family="ui-monospace,Menlo,monospace" font-size="6" fill="var(--fg-faint)">
+          <text x="-59.5" y="-49" text-anchor="middle">45 mm</text>
+          <text transform="translate(73,24) rotate(-90)" text-anchor="middle">94 mm</text>
+          <text x="-12" y="97" text-anchor="middle" font-size="6.5">cube 31.1 mm · start jitter ±15 mm, ±45°</text>
+        </g>
+
+        <g fill="var(--rule-strong)">
+          <rect x="-97" y="68.5" width="170" height="5"/>
+          <rect x="-14.5" y="61" width="5" height="20"/>
+        </g>
+        <rect x="-27.55" y="55.45" width="31.1" height="31.1" rx="1.5"
+              fill="var(--cube)" stroke="var(--fg-muted)" stroke-width=".9"/>
+      </svg>
+      <figcaption><b>Table layout, plan view.</b> World frame, +x right and +y away from the
+      operator; the arm bases sit off-diagram at x&nbsp;=&nbsp;±469&nbsp;mm. Dashed circles are the
+      20&nbsp;mm success radius around each target.</figcaption>
+    </figure>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Cube</th><th>mass</th><th>friction</th><th>differs from A in</th></tr></thead>
+        <tbody>
+          <tr><td>A</td><td class="num">0.020 kg</td><td class="num">1.0</td><td>—</td></tr>
+          <tr><td>B</td><td class="num">0.060 kg</td><td class="num">1.0</td><td>mass</td></tr>
+          <tr><td>C</td><td class="num">0.020 kg</td><td class="num">0.3</td><td>friction</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="fidelity">
+  <div class="wrap">
+    <h2>What the Model Reproduces</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>The robot</h3>
+        <p>mujoco_menagerie's <b>system-identified ALOHA 2</b>, forked into the repo only once an
+        include could no longer be overridden, and proven field-for-field identical to the wrapped
+        model before anything was changed.</p>
+      </div>
+      <div class="card">
+        <h3>The gripper</h3>
+        <p>Command-to-finger travel fitted from <b>45 recorded episodes</b> on quasi-static
+        free-motion samples, R²&nbsp;0.946 and 0.978. The real robot's second, reporting map is
+        reproduced rather than collapsed, because a policy trained on real data sees both.</p>
+      </div>
+      <div class="card">
+        <h3>The table</h3>
+        <p>Markers and cross measured against two frame rails and cross-checked against the overhead
+        frame — which caught a <b>54&nbsp;mm bias</b> in the positions first extracted from the
+        recordings.</p>
+      </div>
+      <div class="card">
+        <h3>The cameras and the cube</h3>
+        <p>Poses and intrinsics from the lab's own calibration instead of menagerie's D405 defaults,
+        wrist cameras placed on the D435i's RGB lens from CAD; the cube is a <b>hollow shell</b>
+        compiled with exact inertia.</p>
+      </div>
+    </div>
+    <p class="vid-note" style="max-width:44em;margin:26px auto 0"><b>Not simulated.</b> There is no
+    tactile sensing in the model. The cube's identity is therefore not inferable from the
+    observation, only from privileged state — the physical difference is real, but this is a
+    manipulation task with a hidden variable rather than a tactile one. The mass and friction values
+    carry the documented ordering, not measured magnitudes.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Built on <a href="https://github.com/google-deepmind/mujoco_menagerie">mujoco_menagerie</a>'s
+    system-identified ALOHA 2 and driven by <a href="https://github.com/RLinf/RLinf">RLinf</a>.</p>
+  </div>
+</footer>
+
+</body>
+</html>
