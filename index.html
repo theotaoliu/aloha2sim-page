@@ -168,6 +168,25 @@ footer a{color:var(--fg-muted)}
       and the unused distractor <b>D</b>, and the cube starts on the painted cross in front of them.
       8.6&nbsp;s, no audio.</p>
     </div>
+
+    <div class="vid">
+      <div class="vid-head">
+        <span class="vid-tag">POLICY VIEW</span>
+        <span class="vid-title">The same episode, four panels</span>
+        <span class="vid-field">render_view.py rollout --seed 1000</span>
+      </div>
+      <video controls muted loop playsinline preload="metadata"
+             poster="media/task1-rollout-grid-poster.jpg">
+        <source src="media/task1-rollout-grid.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+        <a href="media/task1-rollout-grid.mp4">Download the video</a>.
+      </video>
+      <p class="vid-note">One scripted episode as a 2&nbsp;&times;&nbsp;2 grid: a free view of the
+      workspace, then the three streams the policy is actually given &mdash; <b>cam_high</b> overhead
+      and one camera on each wrist. Rendered offscreen through EGL, so the frames come from the model
+      rather than from a screen capture of the viewer. Seed 1000, cube <b>A</b>; the scripted policy
+      reaches the target at step 425 of 500. 960&nbsp;&times;&nbsp;720, 10.0&nbsp;s, no audio.</p>
+    </div>
   </div>
 </section>
 
