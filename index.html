@@ -146,9 +146,9 @@ footer a{color:var(--fg-muted)}
   <div class="wrap">
     <h2>Simulated Rollout</h2>
     <p class="lead">The scene is Task 1 of the real-robot study, hidden-property pick-and-place,
-    rebuilt in MuJoCo. Geometry is not invented: the pick point and the three target zones are the
-    forward-kinematic fingertip positions of 54 usable recorded episodes, and the table markings were
-    measured on the real rig and cross-checked against the overhead camera frame.</p>
+    rebuilt in MuJoCo. Geometry is not invented: the pick point, the three target zones and the table
+    markings were all measured on the real rig against two frame rails and cross-checked against the
+    overhead camera frame — not derived from the recorded episodes.</p>
 
     <div class="vid">
       <div class="vid-head">
@@ -162,7 +162,8 @@ footer a{color:var(--fg-muted)}
         Your browser does not support the video tag.
         <a href="media/task1-hidden-property-grasp.mp4">Download the video</a>.
       </video>
-      <p class="vid-note">MuJoCo's interactive viewer, with the <b>left arm</b> driven by the
+      <p class="vid-note">A screen capture of MuJoCo's interactive viewer, with the <b>left arm</b>
+      driven by the
       scripted waypoint policy that generates the demonstrations; the right arm holds a fixed pose.
       The lettered rectangles on the table are the masking-tape targets <b>A</b>, <b>B</b>, <b>C</b>
       and the unused distractor <b>D</b>, and the cube starts on the painted cross in front of them.
@@ -172,7 +173,7 @@ footer a{color:var(--fg-muted)}
     <div class="vid">
       <div class="vid-head">
         <span class="vid-tag">POLICY VIEW</span>
-        <span class="vid-title">The same episode, four panels</span>
+        <span class="vid-title">One episode, four panels</span>
         <span class="vid-field">render_view.py rollout --seed 1000</span>
       </div>
       <video controls muted loop playsinline preload="metadata"
@@ -286,8 +287,8 @@ footer a{color:var(--fg-muted)}
       <div class="card">
         <h3>The table</h3>
         <p>Markers and cross measured against two frame rails and cross-checked against the overhead
-        frame — which caught a <b>54&nbsp;mm bias</b> in the positions first extracted from the
-        recordings.</p>
+        frame — which caught a <b>54–58&nbsp;mm bias</b> in the positions first extracted
+        from the recordings.</p>
       </div>
       <div class="card">
         <h3>The cameras and the cube</h3>
